@@ -1,3 +1,18 @@
+# Thoughts/Ideas/Journal and progress
+
+I am now at the first task , but I dont see how I am gonna structure this project yet because is still so simple (I might keep this simple architecture for simplicity ).
+PS: To be honest I think we can avoid using Movie and MovieList component and we can put everything in corresponding page directly ( we ll see how it goes )
+
+The main criteria that I have stumbled upon on my current role that would influence the architecture (folder structure / devinding responsabilities) is the following:
+
+- Do I want this component/page/unit to work on itself (indepandent) or be fully dependant ? ===> this influences how to fetch data and how to manage state
+
+so to answer the above i ll have to choose one of the scenarios ( this usually would be concluded by the help of the PM/client/CTO )
+1- new startup/company/project
+2- company has multiple projects whithing same industry and could benefit from sharing components
+
+# Requirements
+
 # C4T NextJS Interview
 
 # How to complete the test

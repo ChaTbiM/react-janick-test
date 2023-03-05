@@ -3,7 +3,7 @@ import { rest } from 'msw'
 import { Movie, MovieCategory } from '~/types/Movie'
 
 const handlers = [
-  rest.get('/movies', (_req, res, ctx) =>
+  rest.get('https://backend.com/movies', (_req, res, ctx) =>
     res(
       ctx.delay(800),
       ctx.json<Movie[]>([
