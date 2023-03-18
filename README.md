@@ -5,11 +5,27 @@ PS: To be honest I think we can avoid using Movie and MovieList component and we
 
 The main criteria that I have stumbled upon on my current role that would influence the architecture (folder structure / devinding responsabilities) is the following:
 
-- Do I want this component/page/unit to work on itself (indepandent) or be fully dependant ? ===> this influences how to fetch data and how to manage state
+- Do I want this component/page/unit to work on itself (indepandent) or be fully dependant ? ===> this influences how to fetch data and how to manage state.
 
-so to answer the above i ll have to choose one of the scenarios ( this usually would be concluded by the help of the PM/client/CTO )
-1- new startup/company/project
-2- company has multiple projects whithing same industry and could benefit from sharing components
+- so to answer the above i ll have to choose one of the scenarios ( this usually would be concluded by the help of the PM/client/CTO )
+
+## Possible Scenarios
+
+1. new startup/company/project
+2. company has multiple projects whithing same industry and could benefit from sharing components
+
+##
+
+- I have decided to go with first scenario where the project is new because the second scenario itself has multiple possiblities and don't want to keep things simple
+
+- Thats bieng said , my head says this is too small of project to demonstrate any architecture/structuring however I am gonna use modules folder structure
+
+- movies module : should include all layers that are meant for a feature to function independently ( except shared components )
+- However I am gonna through a button component in components folder as a sample of components that gonna be shared between many modules but these are components that are presentational/dumb components only , should not update any state nor fetch data
+
+- I have choosen react-query as a tool to handle all of my server requests even though it has slightly more boilerplate but it is definetly an acceptable trade-off for decoupling (easier to rewrite this layer later) and laverage the caching capabilities of this tool.
+
+- When I was trying to implement the popup that show after successfully deleting movie or on error , I tought about moving the functions responsible for that (onDeleteMovieErrorHandler, onDeleteMovieSuccessHandler) to queries.ts file but then I changed my mind because even though those are side effects only but it would more be more logical to give this responsibility to MovieList component also it would be predictable to find it there by other developers also it is the first and only child of this page ( home page that shows movies list).
 
 # Requirements
 

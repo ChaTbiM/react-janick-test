@@ -1,24 +1,19 @@
 import { GetServerSideProps, NextPage } from 'next'
+import { dehydrate, QueryClient } from 'react-query'
 
-import { Movie as MovieType } from '~/types/Movie'
+import { fetchAllMovies } from '~/modules/movies/api/requests'
+import MovieList from '~/modules/movies/components/MovieList'
 
-import MovieList from '~/components/MovieList'
-
-interface HomeProps {
-  data: MovieType[]
-}
-
-/* Replace with your design */
-const Home: NextPage<HomeProps> = ({ data }) => (
+const Home: NextPage = () => (
   <div className="container m-auto">
-    <MovieList movies={data} />
+    <MovieList />
   </div>
 )
 
-export const getServerSideProps: GetServerSideProps<HomeProps> = async () => {
-  const res = await fetch(`https://backend.com/movies`)
-  const data = await res.json()
-  return { props: { data } }
+export const getServerSideProps: GetServerSideProps = async () => {
+  const queryClient = new QueryClient()
+  await queryClient.prefetchQuery('movies', fetchAllMovies)
+  return { props: { dehydratedState: dehydrate(queryClient) } }
 }
 
 export default Home
