@@ -1,4 +1,4 @@
-import { Movie } from '~/types/Movie'
+import { InteractionType, Movie } from '~/types/Movie'
 
 const fetchAllMovies = async (): Promise<Movie[]> => {
   const response = await fetch(`https://backend.com/movies`)
@@ -12,4 +12,21 @@ const deleteMovie = async (movie: Movie): Promise<Movie> => {
   return response.json()
 }
 
-export { deleteMovie, fetchAllMovies }
+export interface InteractWithMovieParams {
+  movie: Movie
+  interaction: InteractionType
+}
+const interactWithMovie = async (
+  movie: Movie,
+  interaction: InteractionType,
+): Promise<Movie> => {
+  const response = await fetch(
+    `https://backend.com/movies/${movie.id}/${interaction}`,
+    {
+      method: 'POST',
+    },
+  )
+  return response.json()
+}
+
+export { deleteMovie, fetchAllMovies, interactWithMovie }

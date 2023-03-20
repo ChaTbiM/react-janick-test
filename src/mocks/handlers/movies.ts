@@ -1,6 +1,6 @@
 import { rest } from 'msw'
 
-import { Movie, MovieCategory } from '~/types/Movie'
+import { InteractionType, Movie, MovieCategory } from '~/types/Movie'
 
 let moviesList: Movie[] = [
   {
@@ -81,9 +81,47 @@ const deleteMovie = (deletedMovieId: number): void => {
   moviesList = moviesList.filter((movie) => deletedMovieId !== movie.id)
 }
 
+const likeMovie = (likedMovieId: number): void => {
+  moviesList = moviesList.map((movie) => {
+    if (movie.id === likedMovieId) {
+      return { ...movie, likes: movie.likes + 1 }
+    }
+
+    return movie
+  })
+}
+
+const dislikeMovie = (dislikedMovieId: number): void => {
+  moviesList = moviesList.map((movie) => {
+    if (movie.id === dislikedMovieId) {
+      return { ...movie, likes: movie.likes - 1 }
+    }
+
+    return movie
+  })
+}
+
 const handlers = [
   rest.get('https://backend.com/movies', (_req, res, ctx) =>
     res(ctx.delay(800), ctx.json<Movie[]>(moviesList)),
+  ),
+  rest.post(
+    'https://backend.com/movies/:movieId/:interaction',
+    (_req, res, ctx) => {
+      const likedMovieId = Number(_req.params.movieId)
+      const interaction = String(_req.params.interaction)
+      const foundMovie = moviesList.find((movie) => movie.id === likedMovieId)
+      if (foundMovie) {
+        if (interaction === InteractionType.Like) {
+          likeMovie(foundMovie.id)
+        } else if (interaction === InteractionType.Dislike) {
+          dislikeMovie(foundMovie.id)
+        }
+        return res(ctx.delay(800), ctx.json<Movie>(foundMovie))
+      }
+
+      return res(ctx.delay(800), ctx.status(404))
+    },
   ),
   rest.delete('https://backend.com/movies/:movieId', (_req, res, ctx) => {
     const deletedMovieId = Number(_req.params.movieId)

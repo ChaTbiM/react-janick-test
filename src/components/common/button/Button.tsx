@@ -15,7 +15,7 @@ const Button: FC<ButtonProps> = ({ theme, text, ...restOfProps }) => {
       {...restOfProps}
       className={`${defaultClasses} ${
         theme === 'primary' ? classesForPrimary : classesForSecondary
-      }`}
+      } ${restOfProps.className}`}
     >
       {text}
     </button>

@@ -1,9 +1,9 @@
 import { useQuery } from 'react-query'
 import Swal from 'sweetalert2'
 
-import { Movie as MovieType } from '~/types/Movie'
+import { InteractionType, Movie as MovieType } from '~/types/Movie'
 
-import { useDeleteMovie } from '../api/queries'
+import { useDeleteMovie, useMovieInteraction } from '../api/queries'
 import { fetchAllMovies } from '../api/requests'
 import Movie from './Movie'
 
@@ -27,6 +27,19 @@ const MovieList: React.FC = () => {
     })
   }
 
+  const onInteractMovieErrorHandle = (
+    movie: MovieType,
+    interaction: InteractionType,
+  ) => {
+    Swal.fire({
+      title: `${interaction.toUpperCase()} Movie`,
+      text: `Unable To ${interaction} ${movie.title} `,
+      icon: 'error',
+      showConfirmButton: false,
+      timer: 2000,
+    })
+  }
+
   const {
     data: movies,
     isLoading,
@@ -36,11 +49,22 @@ const MovieList: React.FC = () => {
     onError: onDeleteMovieErrorHandler,
     onSuccess: onDeleteMovieSuccessHandler,
   })
+  const interactWithMovieMutation = useMovieInteraction({
+    onError: onInteractMovieErrorHandle,
+  })
 
   const deleteMovieHandler = (movie: MovieType) => {
     deleteMovieMutation.mutate(movie)
   }
 
+  const interactWithMovie = (
+    movie: MovieType,
+    interaction: InteractionType,
+  ) => {
+    interactWithMovieMutation.mutate({ movie, interaction })
+  }
+
+  // Rendering
   if (isLoading) {
     return <p>loading movies</p>
   }
@@ -61,7 +85,12 @@ const MovieList: React.FC = () => {
           title={movie.title}
           category={movie.category}
           poster={movie.poster}
+          likes={movie.likes}
           deleteHandler={() => deleteMovieHandler(movie)}
+          likeHandler={(interaction) => interactWithMovie(movie, interaction)}
+          dislikeHandler={(interaction) =>
+            interactWithMovie(movie, interaction)
+          }
         />
       ))}
     </div>

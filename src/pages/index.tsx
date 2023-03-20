@@ -5,7 +5,7 @@ import { fetchAllMovies } from '~/modules/movies/api/requests'
 import MovieList from '~/modules/movies/components/MovieList'
 
 const Home: NextPage = () => (
-  <div className="container m-auto">
+  <div className="container m-auto my-10">
     <MovieList />
   </div>
 )

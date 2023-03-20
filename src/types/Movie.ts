@@ -13,3 +13,8 @@ export interface Movie {
   likes: number
   dislikes: number
 }
+
+export enum InteractionType {
+  Like = 'Like',
+  Dislike = 'Dislike',
+}

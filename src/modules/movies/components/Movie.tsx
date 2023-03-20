@@ -1,7 +1,7 @@
 import Image from 'next/image'
-import { SyntheticEvent } from 'react'
+import { SyntheticEvent, useState } from 'react'
 
-import { MovieCategory } from '~/types/Movie'
+import { InteractionType, MovieCategory } from '~/types/Movie'
 
 import Button from '~/components/common/button'
 
@@ -9,18 +9,42 @@ interface MovieProps {
   title: string
   category: MovieCategory
   poster: string
+  likes: number
   deleteHandler: () => void
+  likeHandler: (interaction: InteractionType) => void
+  dislikeHandler: (interaction: InteractionType) => void
 }
 const Movie: React.FC<MovieProps> = ({
   title,
   category,
   poster,
+  likes,
   deleteHandler,
+  likeHandler,
+  dislikeHandler,
 }) => {
+  const [isLiked, setIsLiked] = useState(false)
+
   const deleteMovie = async (e: SyntheticEvent) => {
     e.preventDefault()
     deleteHandler()
   }
+
+  const likeMovie = async (e: SyntheticEvent, interaction: InteractionType) => {
+    e.preventDefault()
+    setIsLiked(true)
+    likeHandler(interaction)
+  }
+
+  const dislikeMovie = async (
+    e: SyntheticEvent,
+    interaction: InteractionType,
+  ) => {
+    e.preventDefault()
+    setIsLiked(false)
+    dislikeHandler(interaction)
+  }
+
   return (
     <div className="flex flex-col">
       <div className=" relative inline-block h-80 w-60 bg-gradient-to-b from-green-700">
@@ -37,11 +61,24 @@ const Movie: React.FC<MovieProps> = ({
           <p className="font-medium">{category}</p>
         </div>
       </div>
-      <Button
-        onClick={deleteMovie}
-        theme="secondary"
-        text="delete"
-      />
+      <div className="flex justify-between ">
+        <Button
+          className="basis-full"
+          theme="primary"
+          text={isLiked ? `${likes} Dislike` : `${likes} Like`}
+          onClick={
+            isLiked
+              ? (e) => dislikeMovie(e, InteractionType.Dislike)
+              : (e) => likeMovie(e, InteractionType.Like)
+          }
+        />
+        <Button
+          className="basis-full"
+          onClick={deleteMovie}
+          theme="secondary"
+          text="delete"
+        />
+      </div>
     </div>
   )
 }
