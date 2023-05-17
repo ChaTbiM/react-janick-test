@@ -10,6 +10,8 @@ let moviesList: Movie[] = [
     poster: '/images/1.jpg',
     likes: 4,
     dislikes: 1,
+    isLikedByUser: false,
+    isDislikedByUser: false,
   },
   {
     id: 2,
@@ -18,6 +20,8 @@ let moviesList: Movie[] = [
     poster: '/images/2.jpg',
     likes: 2,
     dislikes: 0,
+    isLikedByUser: false,
+    isDislikedByUser: false,
   },
   {
     id: 3,
@@ -26,6 +30,8 @@ let moviesList: Movie[] = [
     poster: '/images/3.jpg',
     likes: 3,
     dislikes: 1,
+    isLikedByUser: false,
+    isDislikedByUser: false,
   },
   {
     id: 4,
@@ -34,6 +40,8 @@ let moviesList: Movie[] = [
     poster: '/images/4.jpg',
     likes: 6,
     dislikes: 6,
+    isLikedByUser: false,
+    isDislikedByUser: false,
   },
   {
     id: 5,
@@ -42,6 +50,8 @@ let moviesList: Movie[] = [
     poster: '/images/5.jpg',
     likes: 16,
     dislikes: 2,
+    isLikedByUser: false,
+    isDislikedByUser: false,
   },
   {
     id: 6,
@@ -50,6 +60,8 @@ let moviesList: Movie[] = [
     poster: '/images/6.jpg',
     likes: 22,
     dislikes: 12,
+    isLikedByUser: false,
+    isDislikedByUser: false,
   },
   {
     id: 7,
@@ -58,6 +70,8 @@ let moviesList: Movie[] = [
     poster: '/images/7.jpg',
     likes: 11,
     dislikes: 3,
+    isLikedByUser: false,
+    isDislikedByUser: false,
   },
   {
     id: 8,
@@ -66,6 +80,8 @@ let moviesList: Movie[] = [
     poster: '/images/8.jpg',
     likes: 2,
     dislikes: 1,
+    isLikedByUser: false,
+    isDislikedByUser: false,
   },
   {
     id: 9,
@@ -74,6 +90,8 @@ let moviesList: Movie[] = [
     poster: '/images/9.jpg',
     likes: 2,
     dislikes: 1,
+    isLikedByUser: false,
+    isDislikedByUser: false,
   },
 ]
 
@@ -83,20 +101,42 @@ const deleteMovie = (deletedMovieId: number): void => {
 
 const likeMovie = (likedMovieId: number): void => {
   moviesList = moviesList.map((movie) => {
-    if (movie.id === likedMovieId) {
-      return { ...movie, likes: movie.likes + 1 }
+    if (movie.id === likedMovieId && !movie.isLikedByUser) {
+      const updatedLikes = movie.likes + 1
+      return { ...movie, likes: updatedLikes, isLikedByUser: true }
     }
+    return movie
+  })
+}
 
+const removeLike = (likedMovieId: number): void => {
+  moviesList = moviesList.map((movie) => {
+    if (movie.id === likedMovieId && movie.isLikedByUser) {
+      const updatedLikes = movie.likes - 1
+      return { ...movie, likes: updatedLikes, isLikedByUser: false }
+    }
     return movie
   })
 }
 
 const dislikeMovie = (dislikedMovieId: number): void => {
   moviesList = moviesList.map((movie) => {
-    if (movie.id === dislikedMovieId) {
-      return { ...movie, likes: movie.likes - 1 }
+    if (movie.id === dislikedMovieId && !movie.isDislikedByUser) {
+      return { ...movie, dislikes: movie.dislikes + 1, isDislikedByUser: true }
     }
+    return movie
+  })
+}
 
+const removeDislike = (dislikedMovieId: number): void => {
+  moviesList = moviesList.map((movie) => {
+    if (movie.id === dislikedMovieId) {
+      return {
+        ...movie,
+        dislikes: movie.dislikes > 0 ? movie.dislikes - 1 : 0,
+        isDislikedByUser: false,
+      }
+    }
     return movie
   })
 }
@@ -109,13 +149,22 @@ const handlers = [
     'https://backend.com/movies/:movieId/:interaction',
     (_req, res, ctx) => {
       const likedMovieId = Number(_req.params.movieId)
-      const interaction = String(_req.params.interaction)
+      const interactionType = String(_req.params.interaction)
+
       const foundMovie = moviesList.find((movie) => movie.id === likedMovieId)
       if (foundMovie) {
-        if (interaction === InteractionType.Like) {
-          likeMovie(foundMovie.id)
-        } else if (interaction === InteractionType.Dislike) {
-          dislikeMovie(foundMovie.id)
+        if (interactionType === InteractionType.Like) {
+          if (!foundMovie.isLikedByUser) {
+            likeMovie(foundMovie.id)
+          } else if (foundMovie.isLikedByUser) {
+            removeLike(foundMovie.id)
+          }
+        } else if (interactionType === InteractionType.Dislike) {
+          if (!foundMovie.isDislikedByUser) {
+            dislikeMovie(foundMovie.id)
+          } else if (foundMovie.isDislikedByUser) {
+            removeDislike(foundMovie.id)
+          }
         }
         return res(ctx.delay(800), ctx.json<Movie>(foundMovie))
       }

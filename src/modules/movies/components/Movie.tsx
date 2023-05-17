@@ -10,6 +10,10 @@ interface MovieProps {
   category: MovieCategory
   poster: string
   likes: number
+  dislikes: number
+  isLikedByUser: boolean
+  isDislikedByUser: boolean
+  isInteractionButtonsLoading: boolean
   deleteHandler: () => void
   likeHandler: (interaction: InteractionType) => void
   dislikeHandler: (interaction: InteractionType) => void
@@ -19,11 +23,16 @@ const Movie: React.FC<MovieProps> = ({
   category,
   poster,
   likes,
+  dislikes,
+  isLikedByUser,
+  isDislikedByUser,
+  isInteractionButtonsLoading,
   deleteHandler,
   likeHandler,
   dislikeHandler,
 }) => {
-  const [isLiked, setIsLiked] = useState(false)
+  const [isLiked, setIsLiked] = useState(isLikedByUser)
+  const [isDisliked, setIsDisliked] = useState(isDislikedByUser)
 
   const deleteMovie = async (e: SyntheticEvent) => {
     e.preventDefault()
@@ -32,8 +41,15 @@ const Movie: React.FC<MovieProps> = ({
 
   const likeMovie = async (e: SyntheticEvent, interaction: InteractionType) => {
     e.preventDefault()
-    setIsLiked(true)
-    likeHandler(interaction)
+    if (isLiked) {
+      // remove liked
+      setIsLiked(false)
+      likeHandler(interaction)
+    } else {
+      // add like and remove dislike if it has one
+      setIsLiked(true)
+      likeHandler(interaction)
+    }
   }
 
   const dislikeMovie = async (
@@ -41,8 +57,13 @@ const Movie: React.FC<MovieProps> = ({
     interaction: InteractionType,
   ) => {
     e.preventDefault()
-    setIsLiked(false)
-    dislikeHandler(interaction)
+    if (isDisliked) {
+      setIsDisliked(false)
+      dislikeHandler(interaction)
+    } else {
+      setIsDisliked(true)
+      dislikeHandler(interaction)
+    }
   }
 
   return (
@@ -63,22 +84,25 @@ const Movie: React.FC<MovieProps> = ({
       </div>
       <div className="flex justify-between ">
         <Button
-          className="basis-full"
+          disabled={isInteractionButtonsLoading}
+          className="mr-2 basis-full"
           theme="primary"
-          text={isLiked ? `${likes} Dislike` : `${likes} Like`}
-          onClick={
-            isLiked
-              ? (e) => dislikeMovie(e, InteractionType.Dislike)
-              : (e) => likeMovie(e, InteractionType.Like)
-          }
+          text={`${likes} Likes`}
+          onClick={(e) => likeMovie(e, InteractionType.Like)}
         />
         <Button
+          disabled={isInteractionButtonsLoading}
           className="basis-full"
-          onClick={deleteMovie}
-          theme="secondary"
-          text="delete"
+          theme="primary"
+          text={`${dislikes} Dislikes`}
+          onClick={(e) => dislikeMovie(e, InteractionType.Dislike)}
         />
       </div>
+      <Button
+        onClick={deleteMovie}
+        theme="secondary"
+        text="delete"
+      />
     </div>
   )
 }

@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react'
 import { useQuery } from 'react-query'
 import Swal from 'sweetalert2'
 
@@ -7,38 +8,42 @@ import { useDeleteMovie, useMovieInteraction } from '../api/queries'
 import { fetchAllMovies } from '../api/requests'
 import Movie from './Movie'
 
-const MovieList: React.FC = () => {
-  const onDeleteMovieErrorHandler = (movie: MovieType) => {
-    Swal.fire({
-      title: 'Delete Movie',
-      text: `Unable to delete ${movie.title}`,
-      icon: 'error',
-      showConfirmButton: false,
-      timer: 2000,
-    })
-  }
-  const onDeleteMovieSuccessHandler = (movie: MovieType) => {
-    Swal.fire({
-      title: 'Delete Movie',
-      text: `Movie with title ${movie.title} , was deleted successfully `,
-      icon: 'success',
-      showConfirmButton: false,
-      timer: 2000,
-    })
-  }
+// Side effect Functions
+const onDeleteMovieErrorHandler = (movie: MovieType) => {
+  Swal.fire({
+    title: 'Delete Movie',
+    text: `Unable to delete ${movie.title}`,
+    icon: 'error',
+    showConfirmButton: false,
+    timer: 2000,
+  })
+}
+const onDeleteMovieSuccessHandler = (movie: MovieType) => {
+  Swal.fire({
+    title: 'Delete Movie',
+    text: `Movie with title ${movie.title} , was deleted successfully `,
+    icon: 'success',
+    showConfirmButton: false,
+    timer: 2000,
+  })
+}
+const onInteractMovieErrorHandle = (
+  movie: MovieType,
+  interaction: InteractionType,
+) => {
+  Swal.fire({
+    title: `${interaction.toUpperCase()} Movie`,
+    text: `Unable To ${interaction} ${movie.title} `,
+    icon: 'error',
+    showConfirmButton: false,
+    timer: 2000,
+  })
+}
+// ---------------------
 
-  const onInteractMovieErrorHandle = (
-    movie: MovieType,
-    interaction: InteractionType,
-  ) => {
-    Swal.fire({
-      title: `${interaction.toUpperCase()} Movie`,
-      text: `Unable To ${interaction} ${movie.title} `,
-      icon: 'error',
-      showConfirmButton: false,
-      timer: 2000,
-    })
-  }
+const MovieList: React.FC = () => {
+  // State
+  const [loadingMovies, setLoadingMovies] = useState(new Set<number>())
 
   const {
     data: movies,
@@ -53,6 +58,7 @@ const MovieList: React.FC = () => {
     onError: onInteractMovieErrorHandle,
   })
 
+  // Event Handlers
   const deleteMovieHandler = (movie: MovieType) => {
     deleteMovieMutation.mutate(movie)
   }
@@ -61,8 +67,20 @@ const MovieList: React.FC = () => {
     movie: MovieType,
     interaction: InteractionType,
   ) => {
-    interactWithMovieMutation.mutate({ movie, interaction })
+    const updatedSet = new Set(loadingMovies)
+    updatedSet.add(movie.id)
+    setLoadingMovies(updatedSet)
+    interactWithMovieMutation.mutate({
+      movie,
+      interaction,
+    })
   }
+
+  useEffect(() => {
+    if (interactWithMovieMutation.isSuccess) {
+      setLoadingMovies(new Set())
+    }
+  }, [interactWithMovieMutation.isSuccess])
 
   // Rendering
   if (isLoading) {
@@ -86,10 +104,18 @@ const MovieList: React.FC = () => {
           category={movie.category}
           poster={movie.poster}
           likes={movie.likes}
+          dislikes={movie.dislikes}
+          isLikedByUser={movie.isLikedByUser}
+          isDislikedByUser={movie.isDislikedByUser}
+          isInteractionButtonsLoading={
+            interactWithMovieMutation.isLoading && loadingMovies.has(movie.id)
+          }
           deleteHandler={() => deleteMovieHandler(movie)}
-          likeHandler={(interaction) => interactWithMovie(movie, interaction)}
-          dislikeHandler={(interaction) =>
-            interactWithMovie(movie, interaction)
+          likeHandler={(interactionType) =>
+            interactWithMovie(movie, interactionType)
+          }
+          dislikeHandler={(interactionType) =>
+            interactWithMovie(movie, interactionType)
           }
         />
       ))}

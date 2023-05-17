@@ -12,6 +12,8 @@ export interface Movie {
   poster: string
   likes: number
   dislikes: number
+  isLikedByUser: boolean
+  isDislikedByUser: boolean
 }
 
 export enum InteractionType {

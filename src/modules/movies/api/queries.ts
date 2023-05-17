@@ -66,12 +66,25 @@ export const useMovieInteraction = ({ onError }: IntercationMutationParams) => {
       const updatedMovies: Movie[] = previousMovies.map((movie) => {
         if (data.movie.id === movie.id) {
           if (data.interaction === InteractionType.Like) {
-            return { ...movie, likes: movie.likes + 1 }
+            if (!movie.isLikedByUser) {
+              return { ...movie, likes: movie.likes + 1, isLikedByUser: true }
+            }
+            return { ...movie, likes: movie.likes - 1, isLikedByUser: false }
           }
           if (data.interaction === InteractionType.Dislike) {
-            return { ...movie, likes: movie.likes - 1 }
+            if (!movie.isDislikedByUser) {
+              return {
+                ...movie,
+                dislikes: movie.dislikes + 1,
+                isDislikedByUser: true,
+              }
+            }
+            return {
+              ...movie,
+              dislikes: movie.dislikes > 0 ? movie.dislikes - 1 : 0,
+              isDislikedByUser: false,
+            }
           }
-          return movie
         }
         return movie
       })
