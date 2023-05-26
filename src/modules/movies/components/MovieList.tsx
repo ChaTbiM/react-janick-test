@@ -6,6 +6,8 @@ import { InteractionType, Movie as MovieType } from '~/types/Movie'
 
 import { useDeleteMovie, useMovieInteraction } from '../api/queries'
 import { fetchAllMovies } from '../api/requests'
+import useFilter from '../hooks/useFilter'
+import Filters from './Filters'
 import Movie from './Movie'
 
 // Side effect Functions
@@ -43,13 +45,14 @@ const onInteractMovieErrorHandle = (
 
 const MovieList: React.FC = () => {
   // State
-  const [loadingMovies, setLoadingMovies] = useState(new Set<number>())
-
   const {
     data: movies,
     isLoading,
     isError,
   } = useQuery('movies', fetchAllMovies)
+  const { filteredData, filterByCategory } = useFilter(movies || [])
+  const [loadingMovies, setLoadingMovies] = useState(new Set<number>())
+
   const deleteMovieMutation = useDeleteMovie({
     onError: onDeleteMovieErrorHandler,
     onSuccess: onDeleteMovieSuccessHandler,
@@ -96,29 +99,39 @@ const MovieList: React.FC = () => {
   }
 
   return (
-    <div className="mx-auto flex max-w-4xl flex-wrap place-content-center gap-10">
-      {movies.map((movie) => (
-        <Movie
-          key={`movie-${movie.id}-${movie.title}`}
-          title={movie.title}
-          category={movie.category}
-          poster={movie.poster}
-          likes={movie.likes}
-          dislikes={movie.dislikes}
-          isLikedByUser={movie.isLikedByUser}
-          isDislikedByUser={movie.isDislikedByUser}
-          isInteractionButtonsLoading={
-            interactWithMovieMutation.isLoading && loadingMovies.has(movie.id)
-          }
-          deleteHandler={() => deleteMovieHandler(movie)}
-          likeHandler={(interactionType) =>
-            interactWithMovie(movie, interactionType)
-          }
-          dislikeHandler={(interactionType) =>
-            interactWithMovie(movie, interactionType)
-          }
+    <div className="mx-auto flex max-w-4xl flex-col">
+      <div className="mb-4">
+        <Filters
+          categoryList={Array.from(
+            new Set(movies.map((movie) => movie.category)),
+          )}
+          filterByCategory={filterByCategory}
         />
-      ))}
+      </div>
+      <div className="flex flex-wrap place-content-center gap-10">
+        {filteredData.map((movie) => (
+          <Movie
+            key={`movie-${movie.id}-${movie.title}`}
+            title={movie.title}
+            category={movie.category}
+            poster={movie.poster}
+            likes={movie.likes}
+            dislikes={movie.dislikes}
+            isLikedByUser={movie.isLikedByUser}
+            isDislikedByUser={movie.isDislikedByUser}
+            isInteractionButtonsLoading={
+              interactWithMovieMutation.isLoading && loadingMovies.has(movie.id)
+            }
+            deleteHandler={() => deleteMovieHandler(movie)}
+            likeHandler={(interactionType) =>
+              interactWithMovie(movie, interactionType)
+            }
+            dislikeHandler={(interactionType) =>
+              interactWithMovie(movie, interactionType)
+            }
+          />
+        ))}
+      </div>
     </div>
   )
 }
