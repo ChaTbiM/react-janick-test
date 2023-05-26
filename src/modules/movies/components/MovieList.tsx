@@ -4,9 +4,12 @@ import Swal from 'sweetalert2'
 
 import { InteractionType, Movie as MovieType } from '~/types/Movie'
 
+import Pagination from '~/components/common/Pagination/Pagination'
+
 import { useDeleteMovie, useMovieInteraction } from '../api/queries'
 import { fetchAllMovies } from '../api/requests'
 import useFilter from '../hooks/useFilter'
+import usePagination from '../hooks/usePagination'
 import Filters from './Filters'
 import Movie from './Movie'
 
@@ -52,6 +55,8 @@ const MovieList: React.FC = () => {
   } = useQuery('movies', fetchAllMovies)
   const { filteredData, filterByCategory } = useFilter(movies || [])
   const [loadingMovies, setLoadingMovies] = useState(new Set<number>())
+  const { currentMovies, currentPage, totalPages, nextPage, prevPage } =
+    usePagination(filteredData, 6)
 
   const deleteMovieMutation = useDeleteMovie({
     onError: onDeleteMovieErrorHandler,
@@ -98,6 +103,14 @@ const MovieList: React.FC = () => {
     return <p>There are no movies currently</p>
   }
 
+  if (currentMovies.length === 0) {
+    return (
+      <div className="flex justify-center align-middle">
+        <p className="text-9xl">😁😁😁</p>
+      </div>
+    )
+  }
+
   return (
     <div className="mx-auto flex max-w-4xl flex-col">
       <div className="mb-4">
@@ -109,7 +122,7 @@ const MovieList: React.FC = () => {
         />
       </div>
       <div className="flex flex-wrap place-content-center gap-10">
-        {filteredData.map((movie) => (
+        {currentMovies.map((movie) => (
           <Movie
             key={`movie-${movie.id}-${movie.title}`}
             title={movie.title}
@@ -132,6 +145,12 @@ const MovieList: React.FC = () => {
           />
         ))}
       </div>
+      <Pagination
+        currentPage={currentPage}
+        totalPages={totalPages}
+        onNextPage={nextPage}
+        onPrevPage={prevPage}
+      />
     </div>
   )
 }
