@@ -67,7 +67,10 @@ const Movie: React.FC<MovieProps> = ({
   }
 
   return (
-    <div className="flex flex-col">
+    <div
+      data-testid="movie"
+      className="flex flex-col"
+    >
       <div className=" relative inline-block h-80 w-60 bg-gradient-to-b from-green-700">
         <Image
           src={poster}
@@ -78,12 +81,23 @@ const Movie: React.FC<MovieProps> = ({
         />
         <div className="absolute inset-x-0 top-0 bottom-3/4 bg-gradient-to-b from-slate-700" />
         <div className="absolute bottom-0 right-0 left-0 bg-gradient-to-t from-slate-800 px-2 pt-20 pb-8  text-center text-white">
-          <h4 className="font-bold capitalize">{title}</h4>
-          <p className="font-medium">{category}</p>
+          <h4
+            data-testid="movie-title"
+            className="font-bold capitalize"
+          >
+            {title}
+          </h4>
+          <p
+            data-testid="movie-category"
+            className="font-medium"
+          >
+            {category}
+          </p>
         </div>
       </div>
       <div className="flex justify-between ">
         <Button
+          data-testid="like-button"
           disabled={isInteractionButtonsLoading}
           className="mr-2 basis-full"
           theme="primary"
@@ -91,6 +105,7 @@ const Movie: React.FC<MovieProps> = ({
           onClick={(e) => likeMovie(e, InteractionType.Like)}
         />
         <Button
+          data-testid="dislike-button"
           disabled={isInteractionButtonsLoading}
           className="basis-full"
           theme="primary"
@@ -99,6 +114,7 @@ const Movie: React.FC<MovieProps> = ({
         />
       </div>
       <Button
+        data-testid="delete-button"
         onClick={deleteMovie}
         theme="secondary"
         text="delete"

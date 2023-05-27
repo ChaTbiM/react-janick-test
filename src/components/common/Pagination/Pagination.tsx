@@ -25,7 +25,8 @@ const Pagination: FC<PaginationProps> = ({
       Previous
     </button>
     <span className="px-4 py-2 text-gray-700">
-      Page {currentPage} of {totalPages}
+      Page <span data-testid="current-page">{currentPage}</span> of{' '}
+      <span data-testid="total-page">{totalPages}</span>
     </span>
     <button
       type="button"

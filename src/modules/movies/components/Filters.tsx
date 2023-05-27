@@ -11,6 +11,7 @@ const Filters: FC<FiltersProps> = ({ registerToFilterForm, categoryList }) => (
   <div className="flex flex-col justify-center align-middle">
     <div>
       <input
+        data-testid="search"
         type="text"
         placeholder="Search..."
         {...registerToFilterForm('searchValue')}
@@ -24,6 +25,7 @@ const Filters: FC<FiltersProps> = ({ registerToFilterForm, categoryList }) => (
           htmlFor={`category-${category}`}
         >
           <input
+            data-testid={`category-${category}`}
             className="mr-2"
             type="checkbox"
             id={`category-${category}`}
