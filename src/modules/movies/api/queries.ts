@@ -26,9 +26,9 @@ export const useDeleteMovie = ({
       await queryClient.cancelQueries({ queryKey: ['movies'] })
 
       const updatedMovies: Movie[] = previousMovies.filter(
-        (previosMovies: Movie) => previosMovies.id === movie.id,
+        (previosMovies: Movie) => previosMovies.id !== movie.id,
       )
-      queryClient.setQueryData(['todos'], updatedMovies)
+      queryClient.setQueryData(['movies'], updatedMovies)
 
       return { previousMovies }
     },
@@ -49,6 +49,7 @@ export const useDeleteMovie = ({
     },
     onSuccess: (deletedMovie: Movie) => {
       onSuccess(deletedMovie)
+      queryClient.invalidateQueries({ queryKey: ['movies'] })
     },
   })
 }

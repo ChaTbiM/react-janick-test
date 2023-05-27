@@ -1,39 +1,21 @@
-import { FC, useEffect } from 'react'
-import { useForm, useWatch } from 'react-hook-form'
+import { FC } from 'react'
+import { FieldValues, UseFormRegister } from 'react-hook-form'
 
-import { MovieCategory } from '~/types/Movie'
-
-type CategoryFilter = {
-  [key in MovieCategory]: boolean
-}
+import { FiltersType, MovieCategory } from '~/types/Movie'
 
 interface FiltersProps {
+  registerToFilterForm: UseFormRegister<FieldValues & FiltersType>
   categoryList: MovieCategory[]
-  filterByCategory: (shownCategories: MovieCategory[]) => void
 }
-
-const Filters: FC<FiltersProps> = ({ categoryList, filterByCategory }) => {
-  const categoryFiltersList = categoryList.reduce(
-    (object, key) => ({ ...object, [key]: false }),
-    {} as CategoryFilter,
-  )
-  const { register, control } = useForm({
-    defaultValues: { categoryFiltersList },
-  })
-
-  const watchedCategoryFilters = useWatch({
-    control,
-    name: 'categoryFiltersList',
-  })
-
-  useEffect(() => {
-    const shownCategories = Object.keys(watchedCategoryFilters).filter(
-      (key) => watchedCategoryFilters[key as keyof typeof MovieCategory],
-    ) as MovieCategory[]
-    filterByCategory(shownCategories)
-  }, [watchedCategoryFilters, filterByCategory])
-
-  return (
+const Filters: FC<FiltersProps> = ({ registerToFilterForm, categoryList }) => (
+  <div className="flex flex-col justify-center align-middle">
+    <div>
+      <input
+        type="text"
+        placeholder="Search..."
+        {...registerToFilterForm('searchValue')}
+      />
+    </div>
     <div>
       {categoryList.map((category) => (
         <label
@@ -45,13 +27,13 @@ const Filters: FC<FiltersProps> = ({ categoryList, filterByCategory }) => {
             className="mr-2"
             type="checkbox"
             id={`category-${category}`}
-            {...register(`categoryFiltersList.${category}`)}
+            {...registerToFilterForm(`categoryFiltersList.${category}`)}
           />
           {category}
         </label>
       ))}
     </div>
-  )
-}
+  </div>
+)
 
 export default Filters

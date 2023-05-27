@@ -53,7 +53,9 @@ const MovieList: React.FC = () => {
     isLoading,
     isError,
   } = useQuery('movies', fetchAllMovies)
-  const { filteredData, filterByCategory } = useFilter(movies || [])
+  const { filteredData, registerToFilterForm, categoryList } = useFilter(
+    movies || [],
+  )
   const [loadingMovies, setLoadingMovies] = useState(new Set<number>())
   const { currentMovies, currentPage, totalPages, nextPage, prevPage } =
     usePagination(filteredData, 6)
@@ -99,58 +101,57 @@ const MovieList: React.FC = () => {
     return <p>Error loading movies</p>
   }
 
-  if (!movies) {
+  if (!movies || movies.length === 0) {
     return <p>There are no movies currently</p>
-  }
-
-  if (currentMovies.length === 0) {
-    return (
-      <div className="flex justify-center align-middle">
-        <p className="text-9xl">😁😁😁</p>
-      </div>
-    )
   }
 
   return (
     <div className="mx-auto flex max-w-4xl flex-col">
       <div className="mb-4">
         <Filters
-          categoryList={Array.from(
-            new Set(movies.map((movie) => movie.category)),
-          )}
-          filterByCategory={filterByCategory}
+          categoryList={categoryList}
+          registerToFilterForm={registerToFilterForm}
         />
       </div>
       <div className="flex flex-wrap place-content-center gap-10">
-        {currentMovies.map((movie) => (
-          <Movie
-            key={`movie-${movie.id}-${movie.title}`}
-            title={movie.title}
-            category={movie.category}
-            poster={movie.poster}
-            likes={movie.likes}
-            dislikes={movie.dislikes}
-            isLikedByUser={movie.isLikedByUser}
-            isDislikedByUser={movie.isDislikedByUser}
-            isInteractionButtonsLoading={
-              interactWithMovieMutation.isLoading && loadingMovies.has(movie.id)
-            }
-            deleteHandler={() => deleteMovieHandler(movie)}
-            likeHandler={(interactionType) =>
-              interactWithMovie(movie, interactionType)
-            }
-            dislikeHandler={(interactionType) =>
-              interactWithMovie(movie, interactionType)
-            }
-          />
-        ))}
+        {currentMovies.length > 0 ? (
+          currentMovies.map((movie) => (
+            <Movie
+              key={`movie-${movie.id}-${movie.title}`}
+              title={movie.title}
+              category={movie.category}
+              poster={movie.poster}
+              likes={movie.likes}
+              dislikes={movie.dislikes}
+              isLikedByUser={movie.isLikedByUser}
+              isDislikedByUser={movie.isDislikedByUser}
+              isInteractionButtonsLoading={
+                interactWithMovieMutation.isLoading &&
+                loadingMovies.has(movie.id)
+              }
+              deleteHandler={() => deleteMovieHandler(movie)}
+              likeHandler={(interactionType) =>
+                interactWithMovie(movie, interactionType)
+              }
+              dislikeHandler={(interactionType) =>
+                interactWithMovie(movie, interactionType)
+              }
+            />
+          ))
+        ) : (
+          <div className="flex justify-center align-middle">
+            <p className="text-9xl">No results 😁</p>
+          </div>
+        )}
       </div>
-      <Pagination
-        currentPage={currentPage}
-        totalPages={totalPages}
-        onNextPage={nextPage}
-        onPrevPage={prevPage}
-      />
+      {currentMovies.length > 0 && (
+        <Pagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          onNextPage={nextPage}
+          onPrevPage={prevPage}
+        />
+      )}
     </div>
   )
 }

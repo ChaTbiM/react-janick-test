@@ -20,3 +20,12 @@ export enum InteractionType {
   Like = 'Like',
   Dislike = 'Dislike',
 }
+
+export type CategoryFilterType = {
+  [key in MovieCategory]: boolean
+}
+
+export type FiltersType = {
+  categoryFiltersList: CategoryFilterType
+  searchValue: string
+}
