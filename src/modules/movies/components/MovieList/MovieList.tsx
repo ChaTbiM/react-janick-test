@@ -6,12 +6,12 @@ import { InteractionType, Movie as MovieType } from '~/types/Movie'
 
 import Pagination from '~/components/common/Pagination/Pagination'
 
-import { useDeleteMovie, useMovieInteraction } from '../api/queries'
-import { fetchAllMovies } from '../api/requests'
-import useFilter from '../hooks/useFilter'
-import usePagination from '../hooks/usePagination'
-import Filters from './Filters'
-import Movie from './Movie'
+import { useDeleteMovie, useMovieInteraction } from '../../api/queries'
+import { fetchAllMovies } from '../../api/requests'
+import useFilter from '../../hooks/useFilter'
+import usePagination from '../../hooks/usePagination'
+import Filters from '../Filters'
+import Movie from '../Movie/Movie'
 
 // Side effect Functions
 const onDeleteMovieErrorHandler = (movie: MovieType) => {

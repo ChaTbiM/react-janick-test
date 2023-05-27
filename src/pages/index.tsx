@@ -2,7 +2,7 @@ import { GetServerSideProps, NextPage } from 'next'
 import { dehydrate, QueryClient } from 'react-query'
 
 import { fetchAllMovies } from '~/modules/movies/api/requests'
-import MovieList from '~/modules/movies/components/MovieList'
+import MovieList from '~/modules/movies/components/MovieList/MovieList'
 
 const Home: NextPage = () => (
   <div className="container m-auto my-10">
